@@ -10,6 +10,26 @@ client = OpenAI(
 
 es_client = Elasticsearch("http://localhost:9200")
 
+# Define the index name
+index_name = "conversations"
+
+if es_client.indices.exists(index=index_name):
+    print("Index exists")
+else:
+    # Define the index mapping
+    index_mapping = {
+        "settings": {"number_of_shards": 1, "number_of_replicas": 0},
+        "mappings": {
+            "properties": {
+                "Context": {"type": "text"},
+                "Response": {"type": "text"},
+            }
+        },
+    }
+
+    # Create the index with the mapping
+    es_client.indices.create(index=index_name, body=index_mapping)
+
 
 def build_prompt_ollama(query, search_re):
     # Define the system-level instructions
